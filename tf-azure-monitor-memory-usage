@@ -35,6 +35,7 @@ resource "azurerm_network_interface" "nic" {
     name                          = "ipconfig1"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.pip.id   # ✅ This line connects the public IP
   }
 }
 
@@ -42,7 +43,8 @@ resource "azurerm_public_ip" "pip" {
   name                = "public-ip-monitor-demo"
   location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Dynamic"   # ✅ This is what was missing
+  sku                 = "Basic"
 }
 
 resource "azurerm_linux_virtual_machine" "vm" {
@@ -69,24 +71,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
     offer     = "0001-com-ubuntu-server-focal"
     sku       = "20_04-lts"
     version   = "latest"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt update -y",
-      "sudo apt install -y stress-ng"
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "azureuser"
-      private_key = file("/home/kenny/.ssh/id_rsa")  # ✅ Replace with the path to your private SSH key if different
-      host        = azurerm_public_ip.pip.ip_address
-    }
-  }
-
-  tags = {
-    environment = "monitor-demo"
   }
 
   depends_on = [azurerm_public_ip.pip]
