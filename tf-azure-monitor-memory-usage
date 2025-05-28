@@ -121,7 +121,7 @@ resource "azurerm_monitor_metric_alert" "memory_alert" {
     metric_name      = "Available Memory Bytes"
     aggregation      = "Average"
     operator         = "LessThan"
-    threshold        = 300000000  # ✅ ~300MB
+    threshold        = 500000000  # ✅ ~500MB
   }
 
   action {
@@ -129,6 +129,6 @@ resource "azurerm_monitor_metric_alert" "memory_alert" {
   }
 }
 
-output "vm_ip" {
-  value = azurerm_public_ip.pip.ip_address
+output "vm_public_ip" {
+  value = azurerm_public_ip.vm_ip.ip_address
 }
